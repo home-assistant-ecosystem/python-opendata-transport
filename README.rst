@@ -14,14 +14,7 @@ The module is available from the `Python Package Index <https://pypi.python.org/
 Usage
 -----
 
-The file ``example.py`` contains a similar example.
-
-.. code:: bash
-
-    >>> from opendata_transport import OpendataTransport
-    >>> data = OpendataTransport('Bern', 'Biel')
-    >>> data.get_data()
-    >>> print(data.connections)
+The file ``example.py`` contains an example about how to use this module.
 
 Development
 -----------
