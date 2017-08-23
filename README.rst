@@ -11,7 +11,10 @@ The module is available from the `Python Package Index <https://pypi.python.org/
 
     $ pip3 install python_opendata_transport
 
-## Usage
+Usage
+-----
+
+The file ``example.py`` contains a similar example.
 
 .. code:: bash
 
