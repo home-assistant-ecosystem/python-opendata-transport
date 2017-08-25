@@ -18,7 +18,7 @@ The file ``example.py`` contains an example about how to use this module.
 
 Development
 -----------
-For development is recommanded to use a ``venv``.
+For development is recommended to use a ``venv``.
 
 .. code:: bash
 
