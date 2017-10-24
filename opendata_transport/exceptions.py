@@ -6,7 +6,7 @@ Licensed under MIT. All rights reserved.
 
 
 class OpendataTransportError(Exception):
-    """General MyStromError exception occurred."""
+    """General OpenDataError exception occurred."""
 
     pass
 
