@@ -24,5 +24,6 @@ def main():
         # Print the details of the next connection
         print(data.connections[0])
 
+
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
