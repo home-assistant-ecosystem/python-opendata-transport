@@ -1,5 +1,5 @@
 """
-Copyright (c) 2015-2017 Fabian Affolter <fabian@affolter-engineering.ch>
+Copyright (c) 2015-2018 Fabian Affolter <fabian@affolter-engineering.ch>
 
 Licensed under MIT. All rights reserved.
 """
@@ -27,18 +27,17 @@ class OpendataTransport(object):
         self.from_name = self.from_id = self.to_name = self.to_id = None
         self.connections = dict()
 
-    @asyncio.coroutine
-    def async_get_data(self):
+    async def async_get_data(self):
         url = '{resource}connections?from={start}&to={dest}'.format(
             resource=_RESOURCE, start=self.start, dest=self.destination)
 
         try:
             with async_timeout.timeout(5, loop=self._loop):
-                response = yield from self._session.get(url)
+                response = await self._session.get(url)
 
             _LOGGER.debug(
                 "Response from transport.opendata.ch: %s", response.status)
-            data = yield from response.json()
+            data = await response.json()
             _LOGGER.debug(data)
         except (asyncio.TimeoutError, aiohttp.ClientError):
             _LOGGER.error("Can not load data from transport.opendata.ch")
