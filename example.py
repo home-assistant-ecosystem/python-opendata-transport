@@ -1,5 +1,5 @@
 """
-Copyright (c) 2015-2017 Fabian Affolter <fabian@affolter-engineering.ch>
+Copyright (c) 2015-2018 Fabian Affolter <fabian@affolter-engineering.ch>
 
 Licensed under MIT. All rights reserved.
 """
@@ -9,11 +9,10 @@ import aiohttp
 from opendata_transport import OpendataTransport
 
 
-@asyncio.coroutine
-def main():
+async def main():
     with aiohttp.ClientSession() as session:
-        data = OpendataTransport('Bern', 'Biel', loop, session)
-        yield from data.async_get_data()
+        data = OpendataTransport('Bex', 'Vevey', loop, session)
+        await data.async_get_data()
 
         # Print the start and the destination name
         print("Train connections:", data.from_name, "->", data.to_name)
