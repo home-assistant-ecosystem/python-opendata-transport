@@ -1,6 +1,11 @@
 Changes
 =======
 
+20180609 - 0.1.3
+----------------
+
+- Modernize setup.py and support long description for PyPI
+
 20180609 - 0.1.1
 ----------------
 
