@@ -3,6 +3,9 @@ python-opendata-transport
 
 Python API for interacting with `transport.opendata.ch <http://transport.opendata.ch/>`_.
 
+Th module which is the base for the integration into `Home Assistant <https://home-assistant.io>`_
+is simply retrieving the details about a given connection between to stations.
+
 This module is not official, developed, supported or endorsed by opendata.ch.
 
 Installation
