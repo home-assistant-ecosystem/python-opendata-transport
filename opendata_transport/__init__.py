@@ -43,8 +43,8 @@ class OpendataTransport(object):
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError()
         except (aiohttp.ClientError) as aiohttpClientError:
-            _LOGGER.error("Response from transport.opendata.ch: %s" \
-                                                 , aiohttpClientError)
+            _LOGGER.error("Response from transport.opendata.ch: %s",
+                          aiohttpClientError)
             raise exceptions.OpendataTransportConnectionError()
 
         try:
