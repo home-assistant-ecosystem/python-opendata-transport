@@ -33,14 +33,18 @@ class OpendataTransport(object):
 
         try:
             with async_timeout.timeout(5, loop=self._loop):
-                response = await self._session.get(url)
+                response = await self._session.get(url, raise_for_status=True)
 
             _LOGGER.debug(
                 "Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
             _LOGGER.debug(data)
-        except (asyncio.TimeoutError, aiohttp.ClientError):
+        except (asyncio.TimeoutError):
             _LOGGER.error("Can not load data from transport.opendata.ch")
+            raise exceptions.OpendataTransportConnectionError()
+        except (aiohttp.ClientError) as aiohttpClientError:
+            _LOGGER.error("Response from transport.opendata.ch: %s",
+                          aiohttpClientError)
             raise exceptions.OpendataTransportConnectionError()
 
         try:
