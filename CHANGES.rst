@@ -1,6 +1,11 @@
 Changes
 =======
 
+20180917 - 0.1.4
+----------------
+
+- Client errors are not reported (Thanks @vikramgorla)
+
 20180609 - 0.1.3
 ----------------
 
