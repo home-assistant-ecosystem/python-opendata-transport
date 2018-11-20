@@ -58,6 +58,7 @@ class OpendataTransport(object):
                 self.connections[index]['departure'] = \
                     conn['from']['departure']
                 self.connections[index]['duration'] = conn['duration']
+                self.connections[index]['delay'] = conn['from']['delay']
                 self.connections[index]['transfers'] = conn['transfers']
                 self.connections[index]['number'] = \
                     conn['sections'][0]['journey']['name']
