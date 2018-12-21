@@ -10,7 +10,7 @@ from opendata_transport import OpendataTransport
 
 
 async def main():
-    with aiohttp.ClientSession() as session:
+    async with aiohttp.ClientSession() as session:
         data = OpendataTransport('Bex', 'Vevey', loop, session)
         await data.async_get_data()
 
