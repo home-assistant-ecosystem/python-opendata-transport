@@ -1,6 +1,7 @@
 """Wrapper to get connection details from Opendata Transport."""
 import asyncio
 import logging
+import urllib.parse
 
 import aiohttp
 import async_timeout
@@ -24,6 +25,7 @@ class OpendataTransport(object):
         self.connections = dict()
 
     async def async_get_data(self):
+        """Retrieve the data for the connection."""
         url = '{resource}connections?from={start}&to={dest}'.format(
             resource=_RESOURCE, start=self.start, dest=self.destination)
 
@@ -35,10 +37,10 @@ class OpendataTransport(object):
                 "Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
             _LOGGER.debug(data)
-        except (asyncio.TimeoutError):
+        except asyncio.TimeoutError:
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError()
-        except (aiohttp.ClientError) as aiohttpClientError:
+        except aiohttp.ClientError as aiohttpClientError:
             _LOGGER.error("Response from transport.opendata.ch: %s",
                           aiohttpClientError)
             raise exceptions.OpendataTransportConnectionError()
