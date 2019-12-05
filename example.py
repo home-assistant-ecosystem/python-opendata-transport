@@ -7,7 +7,9 @@ from opendata_transport import OpendataTransport
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        data = OpendataTransport('Bex', 'Vevey', loop, session)
+        data = OpendataTransport(
+            "Zürich, Blumenfeldstrasse", "Zürich Oerlikon, Bahnhof", loop, session
+        )
         await data.async_get_data()
 
         # Print the start and the destination name
