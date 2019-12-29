@@ -4,6 +4,7 @@ import logging
 
 import aiohttp
 import async_timeout
+import urllib.parse
 
 from . import exceptions
 
@@ -25,9 +26,9 @@ class OpendataTransport(object):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        url = "{resource}connections?from={start}&to={dest}".format(
-            resource=_RESOURCE, start=self.start, dest=self.destination
-        )
+        param = urllib.parse.urlencode({ 'from': self.start, 'to': self.destination })
+        url = "{resource}connections?{param}".format(resource=_RESOURCE, param=param)
+
         try:
             with async_timeout.timeout(5, loop=self._loop):
                 response = await self._session.get(url, raise_for_status=True)
