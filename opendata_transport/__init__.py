@@ -28,20 +28,6 @@ class OpendataTransport(object):
         url = "{resource}connections?from={start}&to={dest}".format(
             resource=_RESOURCE, start=self.start, dest=self.destination
         )
-        print("Z\u00fcrich, Blumenfeldstrasse")
-        print("Zürich, Blumenfeldstrasse")
-        print(url)
-        print(self.start)
-        print(self.destination)
-        print(u"{}".format(self.start))
-        print(u"\u212B".encode("utf-8"))
-        print(u"\u00fc")
-        print("ü")
-        print("-----------------")
-        print(replace_german_umlaute(self.start))
-        test1 = replace_german_umlaute(self.start)
-        print(u"\u212B".encode("utf-8"))
-        print(u"{}".format(test1))
         try:
             with async_timeout.timeout(5, loop=self._loop):
                 response = await self._session.get(url, raise_for_status=True)
@@ -76,30 +62,3 @@ class OpendataTransport(object):
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
 
-
-# umlaute_dict = {
-#     '\xc3\xa4': 'ae',  # U+00E4	   \xc3\xa4
-#     '\xc3\xb6': 'oe',  # U+00F6	   \xc3\xb6
-#     '\xc3\xbc': 'ue',  # U+00FC	   \xc3\xbc
-#     '\xc3\x84': 'Ae',  # U+00C4	   \xc3\x84
-#     '\xc3\x96': 'Oe',  # U+00D6	   \xc3\x96
-#     '\xc3\x9c': 'Ue',  # U+00DC	   \xc3\x9c
-#     '\xc3\x9f': 'ss',  # U+00DF	   \xc3\x9f
-# }
-
-umlaute_dict = {
-    "\xc3\xbc": "\u00fc",
-}
-
-
-def replace_german_umlaute(unicode_string):
-    """."""
-    utf8_string = unicode_string.encode("utf-8")
-    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    print("{}".format(utf8_string))
-    print(u"{}".format(utf8_string))
-    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    for k in umlaute_dict.keys():
-        utf8_string = utf8_string.replace(k, umlaute_dict[k])
-
-    return utf8_string.decode()
