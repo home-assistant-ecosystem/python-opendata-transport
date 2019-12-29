@@ -24,6 +24,17 @@ class OpendataTransport(object):
         self.from_name = self.from_id = self.to_name = self.to_id = None
         self.connections = dict()
 
+    def __get_connection_dict(self, conn):
+        conninfo = dict()
+        conninfo["departure"] = conn["from"]["departure"]
+        conninfo["duration"] = conn["duration"]
+        conninfo["delay"] = conn["from"]["delay"]
+        conninfo["transfers"] = conn["transfers"]
+        conninfo["number"] = conn["sections"][0]["journey"]["name"]
+        conninfo["platform"] = conn["from"]["platform"]
+
+        return conninfo
+
     async def async_get_data(self):
         """Retrieve the data for the connection."""
         param = urllib.parse.urlencode({ 'from': self.start, 'to': self.destination })
@@ -50,15 +61,7 @@ class OpendataTransport(object):
             self.to_name = data["to"]["name"]
             index = 0
             for conn in data["connections"][:3]:
-                self.connections[index] = dict()
-                self.connections[index]["departure"] = conn["from"]["departure"]
-                self.connections[index]["duration"] = conn["duration"]
-                self.connections[index]["delay"] = conn["from"]["delay"]
-                self.connections[index]["transfers"] = conn["transfers"]
-                self.connections[index]["number"] = conn["sections"][0]["journey"][
-                    "name"
-                ]
-                self.connections[index]["platform"] = conn["from"]["platform"]
+                self.connections[index] = self.__get_connection_dict(conn)
                 index = index + 1
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
