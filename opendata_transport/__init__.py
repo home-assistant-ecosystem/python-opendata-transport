@@ -9,16 +9,27 @@ import urllib.parse
 from . import exceptions
 
 _LOGGER = logging.getLogger(__name__)
-_RESOURCE = "http://transport.opendata.ch/v1/"
+_RESOURCE_URL = "http://transport.opendata.ch/v1/"
 
+class OpendataTransportBase(object):
+    """Opendata Transport base class"""
 
-class OpendataTransport(object):
+    def __init__(self, loop, session):
+        self._loop = loop
+        self._session = session
+
+    def get_url(self, resource, params):
+        param = urllib.parse.urlencode(params)
+        url = "{resource_url}{resource}?{param}".format(
+                resource_url=_RESOURCE_URL, resource=resource, param=param)
+        return url
+
+class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
 
     def __init__(self, start, destination, loop, session, limit=3):
         """Initialize the connection."""
-        self._loop = loop
-        self._session = session
+        super().__init__(loop, session)
         self.limit = limit
         self.start = start
         self.destination = destination
@@ -46,10 +57,8 @@ class OpendataTransport(object):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        param = urllib.parse.urlencode(
-                { 'from': self.start, 'to': self.destination,
-                  'limit': self.limit })
-        url = "{resource}connections?{param}".format(resource=_RESOURCE, param=param)
+        url = self.get_url("connections",
+            { 'from': self.start, 'to': self.destination, 'limit': self.limit })
 
         try:
             with async_timeout.timeout(5, loop=self._loop):
