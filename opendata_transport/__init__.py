@@ -30,7 +30,15 @@ class OpendataTransport(object):
         conninfo["duration"] = conn["duration"]
         conninfo["delay"] = conn["from"]["delay"]
         conninfo["transfers"] = conn["transfers"]
-        conninfo["number"] = conn["sections"][0]["journey"]["name"]
+
+        # Sections journey can be null if there is a walking section at
+        # first
+        conninfo["number"] = ""
+        for section in conn["sections"]:
+            if section["journey"] is not None:
+                conninfo["number"] = section["journey"]["name"]
+                break
+
         conninfo["platform"] = conn["from"]["platform"]
 
         return conninfo
