@@ -49,7 +49,7 @@ class OpendataTransport(object):
             self.to_id = data["to"]["id"]
             self.to_name = data["to"]["name"]
             index = 0
-            for conn in data["connections"][1:4]:
+            for conn in data["connections"][:3]:
                 self.connections[index] = dict()
                 self.connections[index]["departure"] = conn["from"]["departure"]
                 self.connections[index]["duration"] = conn["duration"]
