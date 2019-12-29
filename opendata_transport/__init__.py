@@ -15,10 +15,11 @@ _RESOURCE = "http://transport.opendata.ch/v1/"
 class OpendataTransport(object):
     """A class for handling connections from Opendata Transport."""
 
-    def __init__(self, start, destination, loop, session):
+    def __init__(self, start, destination, loop, session, limit=3):
         """Initialize the connection."""
         self._loop = loop
         self._session = session
+        self.limit = limit
         self.start = start
         self.destination = destination
         self.from_name = self.from_id = self.to_name = self.to_id = None
@@ -45,7 +46,9 @@ class OpendataTransport(object):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        param = urllib.parse.urlencode({ 'from': self.start, 'to': self.destination })
+        param = urllib.parse.urlencode(
+                { 'from': self.start, 'to': self.destination,
+                  'limit': self.limit })
         url = "{resource}connections?{param}".format(resource=_RESOURCE, param=param)
 
         try:
@@ -68,7 +71,7 @@ class OpendataTransport(object):
             self.to_id = data["to"]["id"]
             self.to_name = data["to"]["name"]
             index = 0
-            for conn in data["connections"][:3]:
+            for conn in data["connections"]:
                 self.connections[index] = self.__get_connection_dict(conn)
                 index = index + 1
         except (TypeError, IndexError):
