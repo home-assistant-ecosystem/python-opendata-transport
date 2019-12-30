@@ -8,8 +8,8 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+with open(os.path.join(here, 'README.rst'), encoding='utf-8') as readme:
+    long_description = readme.read()
 
 if sys.argv[-1] == 'publish':
     os.system('python3 setup.py sdist upload')
@@ -17,7 +17,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='python_opendata_transport',
-    version='0.1.4',
+    version='0.2.0',
     description='Python API for interacting with transport.opendata.ch.',
     long_description=long_description,
     url='https://github.com/fabaff/python-opendata-transport',
