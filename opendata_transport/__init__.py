@@ -11,8 +11,9 @@ from . import exceptions
 _LOGGER = logging.getLogger(__name__)
 _RESOURCE_URL = "http://transport.opendata.ch/v1/"
 
+
 class OpendataTransportBase(object):
-    """Opendata Transport base class"""
+    """Representation of the Opendata Transport base class"""
 
     def __init__(self, loop, session):
         self._loop = loop
@@ -21,8 +22,10 @@ class OpendataTransportBase(object):
     def get_url(self, resource, params):
         param = urllib.parse.urlencode(params)
         url = "{resource_url}{resource}?{param}".format(
-                resource_url=_RESOURCE_URL, resource=resource, param=param)
+            resource_url=_RESOURCE_URL, resource=resource, param=param
+        )
         return url
+
 
 class OpendataTransportStationboard(OpendataTransportBase):
     """A class for handling stationsboards from Opendata Transport."""
@@ -36,6 +39,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
         self.journeys = []
 
     def __get_journey_dict(self, journey):
+        """Get the journey details."""
         journeyinfo = dict()
         journeyinfo["departure"] = journey["stop"]["departure"]
         journeyinfo["delay"] = journey["stop"]["delay"]
@@ -48,12 +52,12 @@ class OpendataTransportStationboard(OpendataTransportBase):
         return journeyinfo
 
     async def __async_get_data(self, station):
-        """Retrieve the data for the connection."""
-        params = { 'limit': self.limit }
+        """Retrieve the data for the station."""
+        params = {"limit": self.limit}
         if str.isdigit(station):
-            params['id'] = station
+            params["id"] = station
         else:
-            params['station'] = station
+            params["station"] = station
 
         url = self.get_url("stationboard", params)
 
@@ -78,12 +82,14 @@ class OpendataTransportStationboard(OpendataTransportBase):
             raise exceptions.OpendataTransportError()
 
     async def async_get_data(self):
+        """Retrieve the data for the given station."""
         if isinstance(self.station, list):
             for station in self.station:
                 await self.__async_get_data(station)
             list.sort(self.journeys, key=lambda journey: journey["departure"])
         else:
             await self.__async_get_data(self.station)
+
 
 class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
@@ -98,14 +104,14 @@ class OpendataTransport(OpendataTransportBase):
         self.connections = dict()
 
     def __get_connection_dict(self, conn):
+        """Get the connection details."""
         conninfo = dict()
         conninfo["departure"] = conn["from"]["departure"]
         conninfo["duration"] = conn["duration"]
         conninfo["delay"] = conn["from"]["delay"]
         conninfo["transfers"] = conn["transfers"]
 
-        # Sections journey can be null if there is a walking section at
-        # first
+        # Sections journey can be null if there is a walking section at first
         conninfo["number"] = ""
         for section in conn["sections"]:
             if section["journey"] is not None:
@@ -118,8 +124,10 @@ class OpendataTransport(OpendataTransportBase):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        url = self.get_url("connections",
-            { 'from': self.start, 'to': self.destination, 'limit': self.limit })
+        url = self.get_url(
+            "connections",
+            {"from": self.start, "to": self.destination, "limit": self.limit},
+        )
 
         try:
             with async_timeout.timeout(5, loop=self._loop):
@@ -146,4 +154,3 @@ class OpendataTransport(OpendataTransportBase):
                 index = index + 1
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
-
