@@ -8,7 +8,8 @@ from opendata_transport import OpendataTransport
 async def main():
     async with aiohttp.ClientSession() as session:
         data = OpendataTransport(
-            "Zürich, Blumenfeldstrasse", "Zürich Oerlikon, Bahnhof", loop, session
+            "Zürich, Blumenfeldstrasse", "Zürich Oerlikon, Bahnhof", loop,
+            session, 4
         )
         await data.async_get_data()
 

@@ -4,6 +4,7 @@ import logging
 
 import aiohttp
 import async_timeout
+import urllib.parse
 
 from . import exceptions
 
@@ -14,34 +15,42 @@ _RESOURCE = "http://transport.opendata.ch/v1/"
 class OpendataTransport(object):
     """A class for handling connections from Opendata Transport."""
 
-    def __init__(self, start, destination, loop, session):
+    def __init__(self, start, destination, loop, session, limit=3):
         """Initialize the connection."""
         self._loop = loop
         self._session = session
+        self.limit = limit
         self.start = start
         self.destination = destination
         self.from_name = self.from_id = self.to_name = self.to_id = None
         self.connections = dict()
 
+    def __get_connection_dict(self, conn):
+        conninfo = dict()
+        conninfo["departure"] = conn["from"]["departure"]
+        conninfo["duration"] = conn["duration"]
+        conninfo["delay"] = conn["from"]["delay"]
+        conninfo["transfers"] = conn["transfers"]
+
+        # Sections journey can be null if there is a walking section at
+        # first
+        conninfo["number"] = ""
+        for section in conn["sections"]:
+            if section["journey"] is not None:
+                conninfo["number"] = section["journey"]["name"]
+                break
+
+        conninfo["platform"] = conn["from"]["platform"]
+
+        return conninfo
+
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        url = "{resource}connections?from={start}&to={dest}".format(
-            resource=_RESOURCE, start=self.start, dest=self.destination
-        )
-        print("Z\u00fcrich, Blumenfeldstrasse")
-        print("Zürich, Blumenfeldstrasse")
-        print(url)
-        print(self.start)
-        print(self.destination)
-        print(u"{}".format(self.start))
-        print(u"\u212B".encode("utf-8"))
-        print(u"\u00fc")
-        print("ü")
-        print("-----------------")
-        print(replace_german_umlaute(self.start))
-        test1 = replace_german_umlaute(self.start)
-        print(u"\u212B".encode("utf-8"))
-        print(u"{}".format(test1))
+        param = urllib.parse.urlencode(
+                { 'from': self.start, 'to': self.destination,
+                  'limit': self.limit })
+        url = "{resource}connections?{param}".format(resource=_RESOURCE, param=param)
+
         try:
             with async_timeout.timeout(5, loop=self._loop):
                 response = await self._session.get(url, raise_for_status=True)
@@ -62,44 +71,9 @@ class OpendataTransport(object):
             self.to_id = data["to"]["id"]
             self.to_name = data["to"]["name"]
             index = 0
-            for conn in data["connections"][1:4]:
-                self.connections[index] = dict()
-                self.connections[index]["departure"] = conn["from"]["departure"]
-                self.connections[index]["duration"] = conn["duration"]
-                self.connections[index]["delay"] = conn["from"]["delay"]
-                self.connections[index]["transfers"] = conn["transfers"]
-                self.connections[index]["number"] = conn["sections"][0]["journey"][
-                    "name"
-                ]
-                self.connections[index]["platform"] = conn["from"]["platform"]
+            for conn in data["connections"]:
+                self.connections[index] = self.__get_connection_dict(conn)
                 index = index + 1
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
 
-
-# umlaute_dict = {
-#     '\xc3\xa4': 'ae',  # U+00E4	   \xc3\xa4
-#     '\xc3\xb6': 'oe',  # U+00F6	   \xc3\xb6
-#     '\xc3\xbc': 'ue',  # U+00FC	   \xc3\xbc
-#     '\xc3\x84': 'Ae',  # U+00C4	   \xc3\x84
-#     '\xc3\x96': 'Oe',  # U+00D6	   \xc3\x96
-#     '\xc3\x9c': 'Ue',  # U+00DC	   \xc3\x9c
-#     '\xc3\x9f': 'ss',  # U+00DF	   \xc3\x9f
-# }
-
-umlaute_dict = {
-    "\xc3\xbc": "\u00fc",
-}
-
-
-def replace_german_umlaute(unicode_string):
-    """."""
-    utf8_string = unicode_string.encode("utf-8")
-    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    print("{}".format(utf8_string))
-    print(u"{}".format(utf8_string))
-    print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-    for k in umlaute_dict.keys():
-        utf8_string = utf8_string.replace(k, umlaute_dict[k])
-
-    return utf8_string.decode()
