@@ -24,7 +24,7 @@ async def main():
         print(data.connections[0])
 
         data = OpendataTransportStationboard(
-            "Zürich Oerlikon, Bahnhof", loop, session, 4
+            "8591355", loop, session, 4
         )
         await data.async_get_data()
 

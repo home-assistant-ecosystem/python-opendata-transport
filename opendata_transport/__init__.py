@@ -49,8 +49,13 @@ class OpendataTransportStationboard(OpendataTransportBase):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        url = self.get_url("stationboard",
-            { 'station': self.station, 'limit': self.limit })
+        params = { 'limit': self.limit }
+        if str.isdigit(self.station):
+            params['id'] = self.station
+        else:
+            params['station'] = self.station
+
+        url = self.get_url("stationboard", params)
 
         try:
             with async_timeout.timeout(5, loop=self._loop):
