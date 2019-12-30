@@ -20,6 +20,7 @@ class OpendataTransportBase(object):
         self._session = session
 
     def get_url(self, resource, params):
+        """Generate the URL for the request."""
         param = urllib.parse.urlencode(params)
         url = "{resource_url}{resource}?{param}".format(
             resource_url=_RESOURCE_URL, resource=resource, param=param
