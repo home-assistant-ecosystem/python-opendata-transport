@@ -24,6 +24,54 @@ class OpendataTransportBase(object):
                 resource_url=_RESOURCE_URL, resource=resource, param=param)
         return url
 
+class OpendataTransportStationboard(OpendataTransportBase):
+    """A class for handling stationsboards from Opendata Transport."""
+
+    def __init__(self, station, loop, session, limit=5):
+        """Initialize the connection."""
+        super().__init__(loop, session)
+        self.station = station
+        self.limit = limit
+        self.from_name = self.from_id = self.to_name = self.to_id = None
+        self.journeys = []
+
+    def __get_journey_dict(self, journey):
+        journeyinfo = dict()
+        journeyinfo["departure"] = journey["stop"]["departure"]
+        journeyinfo["delay"] = journey["stop"]["delay"]
+        journeyinfo["platform"] = journey["stop"]["platform"]
+        journeyinfo["name"] = journey["name"]
+        journeyinfo["category"] = journey["category"]
+        journeyinfo["number"] = journey["number"]
+        journeyinfo["to"] = journey["to"]
+
+        return journeyinfo
+
+    async def async_get_data(self):
+        """Retrieve the data for the connection."""
+        url = self.get_url("stationboard",
+            { 'station': self.station, 'limit': self.limit })
+
+        try:
+            with async_timeout.timeout(5, loop=self._loop):
+                response = await self._session.get(url, raise_for_status=True)
+
+            _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
+            data = await response.json()
+            _LOGGER.debug(data)
+        except asyncio.TimeoutError:
+            _LOGGER.error("Can not load data from transport.opendata.ch")
+            raise exceptions.OpendataTransportConnectionError()
+        except aiohttp.ClientError as aiohttpClientError:
+            _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
+            raise exceptions.OpendataTransportConnectionError()
+
+        try:
+            for journey in data["stationboard"]:
+                self.journeys.append(self.__get_journey_dict(journey))
+        except (TypeError, IndexError):
+            raise exceptions.OpendataTransportError()
+
 class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
 

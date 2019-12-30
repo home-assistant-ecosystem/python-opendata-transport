@@ -3,6 +3,7 @@ import asyncio
 import aiohttp
 
 from opendata_transport import OpendataTransport
+from opendata_transport import OpendataTransportStationboard
 
 
 async def main():
@@ -21,6 +22,13 @@ async def main():
 
         # Print the details of the next connection
         print(data.connections[0])
+
+        data = OpendataTransportStationboard(
+            "Zürich Oerlikon, Bahnhof", loop, session, 4
+        )
+        await data.async_get_data()
+
+        print(data.journeys)
 
 
 loop = asyncio.get_event_loop()
