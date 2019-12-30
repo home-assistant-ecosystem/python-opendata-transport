@@ -28,7 +28,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
     """A class for handling stationsboards from Opendata Transport."""
 
     def __init__(self, station, loop, session, limit=5):
-        """Initialize the connection."""
+        """Initialize the journey."""
         super().__init__(loop, session)
         self.station = station
         self.limit = limit
@@ -47,13 +47,13 @@ class OpendataTransportStationboard(OpendataTransportBase):
 
         return journeyinfo
 
-    async def async_get_data(self):
+    async def __async_get_data(self, station):
         """Retrieve the data for the connection."""
         params = { 'limit': self.limit }
-        if str.isdigit(self.station):
-            params['id'] = self.station
+        if str.isdigit(station):
+            params['id'] = station
         else:
-            params['station'] = self.station
+            params['station'] = station
 
         url = self.get_url("stationboard", params)
 
@@ -76,6 +76,14 @@ class OpendataTransportStationboard(OpendataTransportBase):
                 self.journeys.append(self.__get_journey_dict(journey))
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
+
+    async def async_get_data(self):
+        if isinstance(self.station, list):
+            for station in self.station:
+                await self.__async_get_data(station)
+            list.sort(self.journeys, key=lambda journey: journey["departure"])
+        else:
+            await self.__async_get_data(self.station)
 
 class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
