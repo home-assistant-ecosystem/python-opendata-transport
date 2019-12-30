@@ -24,6 +24,8 @@ async def main():
         # Print the details of the next connection
         print(connection.connections[0])
 
+        print()
+
         # Get all connections of a station
         stationboard = OpendataTransportStationboard("8591355", loop, session, 4)
         await stationboard.async_get_data()
