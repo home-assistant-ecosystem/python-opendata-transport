@@ -19,7 +19,8 @@ class OpendataTransportBase(object):
         self._loop = loop
         self._session = session
 
-    def get_url(self, resource, params):
+    @staticmethod
+    def get_url(resource, params):
         """Generate the URL for the request."""
         param = urllib.parse.urlencode(params)
         url = "{resource_url}{resource}?{param}".format(
@@ -39,18 +40,18 @@ class OpendataTransportStationboard(OpendataTransportBase):
         self.from_name = self.from_id = self.to_name = self.to_id = None
         self.journeys = []
 
-    def __get_journey_dict(self, journey):
+    @staticmethod
+    def get_journey(journey):
         """Get the journey details."""
-        journeyinfo = dict()
-        journeyinfo["departure"] = journey["stop"]["departure"]
-        journeyinfo["delay"] = journey["stop"]["delay"]
-        journeyinfo["platform"] = journey["stop"]["platform"]
-        journeyinfo["name"] = journey["name"]
-        journeyinfo["category"] = journey["category"]
-        journeyinfo["number"] = journey["number"]
-        journeyinfo["to"] = journey["to"]
-
-        return journeyinfo
+        return {
+            "departure": journey["stop"]["departure"],
+            "delay": journey["stop"]["delay"],
+            "platform": journey["stop"]["platform"],
+            "name": journey["name"],
+            "category": journey["category"],
+            "number": journey["number"],
+            "to": journey["to"],
+        }
 
     async def __async_get_data(self, station):
         """Retrieve the data for the station."""
@@ -78,7 +79,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
 
         try:
             for journey in data["stationboard"]:
-                self.journeys.append(self.__get_journey_dict(journey))
+                self.journeys.append(self.get_journey(journey))
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
 
@@ -104,24 +105,25 @@ class OpendataTransport(OpendataTransportBase):
         self.from_name = self.from_id = self.to_name = self.to_id = None
         self.connections = dict()
 
-    def __get_connection_dict(self, conn):
+    @staticmethod
+    def get_connection(connection):
         """Get the connection details."""
-        conninfo = dict()
-        conninfo["departure"] = conn["from"]["departure"]
-        conninfo["duration"] = conn["duration"]
-        conninfo["delay"] = conn["from"]["delay"]
-        conninfo["transfers"] = conn["transfers"]
+        connection_info = dict()
+        connection_info["departure"] = connection["from"]["departure"]
+        connection_info["duration"] = connection["duration"]
+        connection_info["delay"] = connection["from"]["delay"]
+        connection_info["transfers"] = connection["transfers"]
 
         # Sections journey can be null if there is a walking section at first
-        conninfo["number"] = ""
-        for section in conn["sections"]:
+        connection_info["number"] = ""
+        for section in connection["sections"]:
             if section["journey"] is not None:
-                conninfo["number"] = section["journey"]["name"]
+                connection_info["number"] = section["journey"]["name"]
                 break
 
-        conninfo["platform"] = conn["from"]["platform"]
+        connection_info["platform"] = connection["from"]["platform"]
 
-        return conninfo
+        return connection_info
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
@@ -150,8 +152,8 @@ class OpendataTransport(OpendataTransportBase):
             self.to_id = data["to"]["id"]
             self.to_name = data["to"]["name"]
             index = 0
-            for conn in data["connections"]:
-                self.connections[index] = self.__get_connection_dict(conn)
+            for connection in data["connections"]:
+                self.connections[index] = self.get_connection(connection)
                 index = index + 1
         except (TypeError, IndexError):
             raise exceptions.OpendataTransportError()
