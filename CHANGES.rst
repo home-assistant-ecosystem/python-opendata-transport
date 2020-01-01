@@ -1,6 +1,13 @@
 Changes
 =======
 
+20191231 - 0.2.0
+----------------
+
+- Stationboard support (Thanks @agners)
+- Various improvements (Thanks @agners)
+- Adding delay to response (Thanks @cwilhelm)
+
 20180917 - 0.1.4
 ----------------
 
