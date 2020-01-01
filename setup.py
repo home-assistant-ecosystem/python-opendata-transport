@@ -17,7 +17,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='python_opendata_transport',
-    version='0.2.0',
+    version='0.2.1',
     description='Python API for interacting with transport.opendata.ch.',
     long_description=long_description,
     url='https://github.com/fabaff/python-opendata-transport',
