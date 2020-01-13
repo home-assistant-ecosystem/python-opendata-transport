@@ -85,6 +85,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
 
     async def async_get_data(self):
         """Retrieve the data for the given station."""
+        self.journeys = []
         if isinstance(self.station, list):
             for station in self.station:
                 await self.__async_get_data(station)
