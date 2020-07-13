@@ -25,7 +25,7 @@ setup(
     author='Fabian Affolter',
     author_email='fabian@affolter-engineering.ch',
     license='MIT',
-    install_requires=['aiohttp', 'async_timeout', 'urllib3'],
+    install_requires=['aiohttp<4', 'async_timeout<4', 'urllib3'],
     packages=find_packages(),
     zip_safe=True,
     classifiers=[
