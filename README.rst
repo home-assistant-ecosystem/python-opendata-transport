@@ -23,6 +23,13 @@ On a Fedora-based system or on a CentOS/RHEL 8 machine with has EPEL enabled.
 
     $ sudo dnf -y install python3-opendata-transport
 
+For Nix or NixOS users is a package available. Keep in mind that the lastest releases might only
+be present in the `unstable` channel.
+
+.. code:: bash
+
+    $ nix-env -iA nixos.python39Packages.python-opendata-transport
+
 Usage
 -----
 
