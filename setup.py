@@ -22,7 +22,6 @@ setup(
     license="MIT",
     install_requires=[
         "aiohttp>=3.7.4,<4",
-        "async_timeout<4",
         "urllib3",
     ],
     packages=find_packages(),

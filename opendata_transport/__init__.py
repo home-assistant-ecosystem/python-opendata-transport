@@ -3,7 +3,6 @@ import asyncio
 import logging
 
 import aiohttp
-import async_timeout
 import urllib.parse
 
 from . import exceptions
@@ -64,8 +63,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
         url = self.get_url("stationboard", params)
 
         try:
-            with async_timeout.timeout(5, loop=self._loop):
-                response = await self._session.get(url, raise_for_status=True)
+            response = await self._session.get(url, raise_for_status=True)
 
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
@@ -134,8 +132,7 @@ class OpendataTransport(OpendataTransportBase):
         )
 
         try:
-            with async_timeout.timeout(5, loop=self._loop):
-                response = await self._session.get(url, raise_for_status=True)
+            response = await self._session.get(url, raise_for_status=True)
 
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
