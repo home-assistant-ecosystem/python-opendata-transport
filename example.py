@@ -11,7 +11,7 @@ async def main():
     async with aiohttp.ClientSession() as session:
         # Get the connection for a defined route
         connection = OpendataTransport(
-            "Zürich, Blumenfeldstrasse", "Zürich Oerlikon, Bahnhof", loop, session, 4
+            "Zürich, Blumenfeldstrasse", "Zürich Oerlikon, Bahnhof", session, 4
         )
         await connection.async_get_data()
 
@@ -27,12 +27,12 @@ async def main():
         print()
 
         # Get all connections of a station
-        stationboard = OpendataTransportStationboard("8591355", loop, session, 4)
+        stationboard = OpendataTransportStationboard("8591355", session, 4)
         await stationboard.async_get_data()
 
         # Print the journey data
         print(stationboard.journeys)
 
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
+if __name__ == "__main__":
+    asyncio.run(main())
