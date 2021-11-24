@@ -14,8 +14,7 @@ _RESOURCE_URL = "http://transport.opendata.ch/v1/"
 class OpendataTransportBase(object):
     """Representation of the Opendata Transport base class"""
 
-    def __init__(self, loop, session):
-        self._loop = loop
+    def __init__(self, session):
         self._session = session
 
     @staticmethod
@@ -31,9 +30,9 @@ class OpendataTransportBase(object):
 class OpendataTransportStationboard(OpendataTransportBase):
     """A class for handling stationsboards from Opendata Transport."""
 
-    def __init__(self, station, loop, session, limit=5):
+    def __init__(self, station, session, limit=5):
         """Initialize the journey."""
-        super().__init__(loop, session)
+        super().__init__(session)
         self.station = station
         self.limit = limit
         self.from_name = self.from_id = self.to_name = self.to_id = None
@@ -95,9 +94,9 @@ class OpendataTransportStationboard(OpendataTransportBase):
 class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
 
-    def __init__(self, start, destination, loop, session, limit=3):
+    def __init__(self, start, destination, session, limit=3):
         """Initialize the connection."""
-        super().__init__(loop, session)
+        super().__init__(session)
         self.limit = limit
         self.start = start
         self.destination = destination
