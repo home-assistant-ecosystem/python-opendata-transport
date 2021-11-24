@@ -1,5 +1,6 @@
 """Example to get the details for a connection or a station."""
 import asyncio
+
 import aiohttp
 
 from opendata_transport import OpendataTransport
