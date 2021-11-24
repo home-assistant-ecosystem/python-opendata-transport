@@ -12,7 +12,7 @@ with open(os.path.join(here, "README.rst"), encoding="utf-8") as readme:
 
 setup(
     name="python_opendata_transport",
-    version="0.2.2",
+    version="0.3.0",
     description="Python API for interacting with transport.opendata.ch.",
     long_description=long_description,
     url="https://github.com/home-assistant-ecosystem/python-opendata-transport",
@@ -25,6 +25,7 @@ setup(
         "urllib3",
     ],
     packages=find_packages(),
+    python_requires=">=3.8",
     zip_safe=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -34,8 +35,8 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Utilities",
     ],
 )
