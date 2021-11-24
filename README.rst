@@ -35,17 +35,6 @@ Usage
 
 The file ``example.py`` contains an example about how to use this module.
 
-Development
------------
-
-For development is recommended to use a ``venv``.
-
-.. code:: bash
-
-    $ python3 -m venv .
-    $ source bin/activate
-    $ python3 setup.py develop
-
 License
 -------
 
