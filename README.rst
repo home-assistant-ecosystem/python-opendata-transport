@@ -28,7 +28,7 @@ be present in the ``unstable`` channel.
 
 .. code:: bash
 
-    $ nix-env -iA nixos.python39Packages.python-opendata-transport
+    $ nix-env -iA nixos.python3Packages.python-opendata-transport
 
 Usage
 -----
