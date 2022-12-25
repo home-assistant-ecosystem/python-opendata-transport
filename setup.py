@@ -21,7 +21,7 @@ setup(
     author_email="fabian@affolter-engineering.ch",
     license="MIT",
     install_requires=[
-        "aiohttp>=3.7.4,<4",
+        "aiohttp>=3.8.0,<4",
         "urllib3",
     ],
     packages=find_packages(),
