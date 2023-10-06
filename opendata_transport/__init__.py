@@ -27,6 +27,69 @@ class OpendataTransportBase(object):
         print(url)
         return url
 
+class OpendataTransportLocation(OpendataTransportBase):
+    """A class for handling locations from Opendata Transport."""
+
+    def __init__(self, session, query=None, x=None, y=None, type_="all", fields=None):
+        """Initialize the location."""
+        super().__init__(session)
+
+        self.query = query
+        self.x = x
+        self.y = y
+        self.type = type_
+        self.fields = fields if fields is not None and isinstance(fields, list) else None
+
+        self.from_name = self.from_id = self.to_name = self.to_id = None
+
+        self.locations = []
+
+    @staticmethod
+    def get_station(station):
+        """Get the station details."""
+        return {
+            "name": station["name"],
+            "score": station["score"],
+            "coordinate_type": station["coordinate"]["type"],
+            "x": station["coordinate"]["x"],
+            "y": station["coordinate"]["y"],
+            "distance": station["distance"],
+        }
+
+    async def async_get_data(self):
+        """Retrieve the data for the location."""
+        params = {
+        }
+        if self.query is not None:
+            params["query"] = self.query
+        else:
+            params["x"] = self.x
+            params["y"] = self.y
+
+        if self.fields:
+            params["fields"] = self.fields
+
+        url = self.get_url("locations", params)
+
+        try:
+            response = await self._session.get(url, raise_for_status=True)
+
+            _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
+            data = await response.json()
+            _LOGGER.debug(data)
+        except asyncio.TimeoutError:
+            _LOGGER.error("Can not load data from transport.opendata.ch")
+            raise exceptions.OpendataTransportConnectionError()
+        except aiohttp.ClientError as aiohttpClientError:
+            _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
+            raise exceptions.OpendataTransportConnectionError()
+
+        try:
+            for station in data["stations"]:
+                self.locations.append(self.get_station(station))
+        except (TypeError, IndexError):
+            raise exceptions.OpendataTransportError()
+
 
 class OpendataTransportStationboard(OpendataTransportBase):
     """A class for handling stationsboards from Opendata Transport."""
