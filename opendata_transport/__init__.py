@@ -20,22 +20,30 @@ class OpendataTransportBase(object):
     @staticmethod
     def get_url(resource, params):
         """Generate the URL for the request."""
-        param = urllib.parse.urlencode(params)
+        param = urllib.parse.urlencode(params, True)
         url = "{resource_url}{resource}?{param}".format(
             resource_url=_RESOURCE_URL, resource=resource, param=param
         )
+        print(url)
         return url
 
 
 class OpendataTransportStationboard(OpendataTransportBase):
     """A class for handling stationsboards from Opendata Transport."""
 
-    def __init__(self, station, session, limit=5):
+    def __init__(self, station, session, limit=5, transportations=None, datetime=None, type_="departure", fields=None):
         """Initialize the journey."""
         super().__init__(session)
+
         self.station = station
         self.limit = limit
+        self.datetime = datetime
+        self.transportations = transportations if transportations is not None and isinstance(transportations, list) else None
+        self.type = type_
+        self.fields = fields if fields is not None and isinstance(fields, list) else None
+
         self.from_name = self.from_id = self.to_name = self.to_id = None
+
         self.journeys = []
 
     @staticmethod
@@ -53,11 +61,20 @@ class OpendataTransportStationboard(OpendataTransportBase):
 
     async def __async_get_data(self, station):
         """Retrieve the data for the station."""
-        params = {"limit": self.limit}
+        params = {
+            "limit": self.limit,
+            "type": self.type,
+        }
         if str.isdigit(station):
             params["id"] = station
         else:
             params["station"] = station
+        if self.date:
+            params["datetime"] = self.datetime
+        if self.transportations:
+            params["transportations"] = self.transportations
+        if self.fields:
+            params["fields"] = self.fields
 
         url = self.get_url("stationboard", params)
 
@@ -94,13 +111,28 @@ class OpendataTransportStationboard(OpendataTransportBase):
 class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
 
-    def __init__(self, start, destination, session, limit=3):
+    def __init__(self, start, destination, session, limit=3, page=0, date=None, time=None, isArrivalTime=False, transportations=None, direct=False, sleeper=False, couchette=False, bike=False, accessibility=None, via=None, fields=None):
         """Initialize the connection."""
         super().__init__(session)
+
         self.limit = limit
+        self.page = page
         self.start = start
         self.destination = destination
+        self.via = via[:5] if via is not None and isinstance(via, list) else None
+        self.date = date
+        self.time = time
+        self.isArrivalTime = 1 if isArrivalTime else 0
+        self.transportations = transportations if transportations is not None and isinstance(transportations, list) else None
+        self.direct =  1 if direct else 0
+        self.sleeper =  1 if sleeper else 0
+        self.couchette =  1 if couchette else 0
+        self.bike =  1 if bike else 0
+        self.accessibility = accessibility
+        self.fields = fields if fields is not None and isinstance(fields, list) else None
+
         self.from_name = self.from_id = self.to_name = self.to_id = None
+
         self.connections = dict()
 
     @staticmethod
@@ -125,10 +157,31 @@ class OpendataTransport(OpendataTransportBase):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        url = self.get_url(
-            "connections",
-            {"from": self.start, "to": self.destination, "limit": self.limit},
-        )
+        params = { 
+            "from": self.start, 
+            "to": self.destination, 
+            "limit": self.limit,
+            "page": self.page,
+            "isArrivalTime": self.isArrivalTime,
+            "direct": self.direct,
+            "sleeper": self.sleeper,
+            "couchette": self.couchette,
+            "bike": self.bike
+        }
+        if self.via:
+            params["via"] = self.via
+        if self.time:
+            params["time"] = self.time
+        if self.date:
+            params["date"] = self.date
+        if self.transportations:
+            params["transportations"] = self.transportations
+        if self.accessibility:
+            params["accessibility"] = self.accessibility
+        if self.fields:
+            params["fields"] = self.fields
+        
+        url = self.get_url("connections", params)
 
         try:
             response = await self._session.get(url, raise_for_status=True)
