@@ -27,6 +27,7 @@ class OpendataTransportBase(object):
         print(url)
         return url
 
+
 class OpendataTransportLocation(OpendataTransportBase):
     """A class for handling locations from Opendata Transport."""
 
@@ -38,7 +39,9 @@ class OpendataTransportLocation(OpendataTransportBase):
         self.x = x
         self.y = y
         self.type = type_
-        self.fields = fields if fields is not None and isinstance(fields, list) else None
+        self.fields = (
+            fields if fields is not None and isinstance(fields, list) else None
+        )
 
         self.from_name = self.from_id = self.to_name = self.to_id = None
 
@@ -58,8 +61,7 @@ class OpendataTransportLocation(OpendataTransportBase):
 
     async def async_get_data(self):
         """Retrieve the data for the location."""
-        params = {
-        }
+        params = {}
         if self.query is not None:
             params["query"] = self.query
         else:
@@ -94,16 +96,31 @@ class OpendataTransportLocation(OpendataTransportBase):
 class OpendataTransportStationboard(OpendataTransportBase):
     """A class for handling stationsboards from Opendata Transport."""
 
-    def __init__(self, station, session, limit=5, transportations=None, datetime=None, type_="departure", fields=None):
+    def __init__(
+        self,
+        station,
+        session,
+        limit=5,
+        transportations=None,
+        datetime=None,
+        type_="departure",
+        fields=None,
+    ):
         """Initialize the journey."""
         super().__init__(session)
 
         self.station = station
         self.limit = limit
         self.datetime = datetime
-        self.transportations = transportations if transportations is not None and isinstance(transportations, list) else None
+        self.transportations = (
+            transportations
+            if transportations is not None and isinstance(transportations, list)
+            else None
+        )
         self.type = type_
-        self.fields = fields if fields is not None and isinstance(fields, list) else None
+        self.fields = (
+            fields if fields is not None and isinstance(fields, list) else None
+        )
 
         self.from_name = self.from_id = self.to_name = self.to_id = None
 
@@ -174,7 +191,25 @@ class OpendataTransportStationboard(OpendataTransportBase):
 class OpendataTransport(OpendataTransportBase):
     """A class for handling connections from Opendata Transport."""
 
-    def __init__(self, start, destination, session, limit=3, page=0, date=None, time=None, isArrivalTime=False, transportations=None, direct=False, sleeper=False, couchette=False, bike=False, accessibility=None, via=None, fields=None):
+    def __init__(
+        self,
+        start,
+        destination,
+        session,
+        limit=3,
+        page=0,
+        date=None,
+        time=None,
+        isArrivalTime=False,
+        transportations=None,
+        direct=False,
+        sleeper=False,
+        couchette=False,
+        bike=False,
+        accessibility=None,
+        via=None,
+        fields=None,
+    ):
         """Initialize the connection."""
         super().__init__(session)
 
@@ -186,13 +221,19 @@ class OpendataTransport(OpendataTransportBase):
         self.date = date
         self.time = time
         self.isArrivalTime = 1 if isArrivalTime else 0
-        self.transportations = transportations if transportations is not None and isinstance(transportations, list) else None
-        self.direct =  1 if direct else 0
-        self.sleeper =  1 if sleeper else 0
-        self.couchette =  1 if couchette else 0
-        self.bike =  1 if bike else 0
+        self.transportations = (
+            transportations
+            if transportations is not None and isinstance(transportations, list)
+            else None
+        )
+        self.direct = 1 if direct else 0
+        self.sleeper = 1 if sleeper else 0
+        self.couchette = 1 if couchette else 0
+        self.bike = 1 if bike else 0
         self.accessibility = accessibility
-        self.fields = fields if fields is not None and isinstance(fields, list) else None
+        self.fields = (
+            fields if fields is not None and isinstance(fields, list) else None
+        )
 
         self.from_name = self.from_id = self.to_name = self.to_id = None
 
@@ -220,16 +261,16 @@ class OpendataTransport(OpendataTransportBase):
 
     async def async_get_data(self):
         """Retrieve the data for the connection."""
-        params = { 
-            "from": self.start, 
-            "to": self.destination, 
+        params = {
+            "from": self.start,
+            "to": self.destination,
             "limit": self.limit,
             "page": self.page,
             "isArrivalTime": self.isArrivalTime,
             "direct": self.direct,
             "sleeper": self.sleeper,
             "couchette": self.couchette,
-            "bike": self.bike
+            "bike": self.bike,
         }
         if self.via:
             params["via"] = self.via
@@ -243,7 +284,7 @@ class OpendataTransport(OpendataTransportBase):
             params["accessibility"] = self.accessibility
         if self.fields:
             params["fields"] = self.fields
-        
+
         url = self.get_url("connections", params)
 
         try:
