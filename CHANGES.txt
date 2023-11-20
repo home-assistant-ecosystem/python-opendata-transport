@@ -1,13 +1,13 @@
 Changes
 =======
 
-20231006 - 0.4.0
+20231120 - 0.4.0
 ----------------
 
-- locations: add api implementation
-- connections: add missing parameters
-- stationboard: add missing parameters
-- urlli/urlencode: Add "True" flag for correct formatting of lists (ex. via parameter `via[]=foo1&via[]=foo2`)
+- Add support locations API (thanks @miaucl)
+- Add missing connections parameters (thanks @miaucl)
+- Add missing stationboard parameters (thanks @miaucl)
+- Add "True" flag for correct formatting of lists (ex. via parameter `via[]=foo1&via[]=foo2`)  (thanks @miaucl)
 
 20211124 - 0.3.0
 ----------------
