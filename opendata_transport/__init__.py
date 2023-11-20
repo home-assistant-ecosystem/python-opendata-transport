@@ -149,8 +149,8 @@ class OpendataTransportStationboard(OpendataTransportBase):
             params["id"] = station
         else:
             params["station"] = station
-        if self.date:
-            params["datetime"] = self.datetime
+        if self.datetime:
+            params["datetime"] = self.date
         if self.transportations:
             params["transportations"] = self.transportations
         if self.fields:
