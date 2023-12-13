@@ -1,6 +1,11 @@
 Changes
 =======
 
+20231213 - 0.4.1
+----------------
+
+- Add KeyError exception (thanks @miaucl)
+
 20231120 - 0.4.0
 ----------------
 
