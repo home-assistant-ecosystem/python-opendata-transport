@@ -89,7 +89,7 @@ class OpendataTransportLocation(OpendataTransportBase):
         try:
             for station in data["stations"]:
                 self.locations.append(self.get_station(station))
-        except (TypeError, IndexError):
+        except (KeyError, TypeError, IndexError):
             raise exceptions.OpendataTransportError()
 
 
@@ -174,7 +174,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
         try:
             for journey in data["stationboard"]:
                 self.journeys.append(self.get_journey(journey))
-        except (TypeError, IndexError):
+        except (KeyError, TypeError, IndexError):
             raise exceptions.OpendataTransportError()
 
     async def async_get_data(self):
@@ -309,5 +309,5 @@ class OpendataTransport(OpendataTransportBase):
             for connection in data["connections"]:
                 self.connections[index] = self.get_connection(connection)
                 index = index + 1
-        except (TypeError, IndexError):
+        except (KeyError, TypeError, IndexError):
             raise exceptions.OpendataTransportError()
