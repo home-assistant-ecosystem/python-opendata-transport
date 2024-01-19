@@ -252,7 +252,9 @@ class OpendataTransport(OpendataTransportBase):
         connection_info["number"] = ""
         for section in connection["sections"]:
             if section["journey"] is not None:
-                connection_info["number"] = section["journey"]["name"]
+                journey = section["journey"]
+                connection_info["number"] = journey["name"]
+                connection_info["line"] = ''.join(filter(None, [journey["category"], journey["number"]]))
                 break
 
         connection_info["platform"] = connection["from"]["platform"]
