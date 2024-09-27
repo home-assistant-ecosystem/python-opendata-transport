@@ -12,7 +12,7 @@ with open(os.path.join(here, "README.rst"), encoding="utf-8") as readme:
 
 setup(
     name="python_opendata_transport",
-    version="0.4.0",
+    version="0.5.0",
     description="Python API for interacting with transport.opendata.ch.",
     long_description=long_description,
     url="https://github.com/home-assistant-ecosystem/python-opendata-transport",
