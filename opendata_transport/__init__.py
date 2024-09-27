@@ -79,18 +79,18 @@ class OpendataTransportLocation(OpendataTransportBase):
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
             _LOGGER.debug(data)
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             _LOGGER.error("Can not load data from transport.opendata.ch")
-            raise exceptions.OpendataTransportConnectionError()
+            raise exceptions.OpendataTransportConnectionError() from e
         except aiohttp.ClientError as aiohttpClientError:
             _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
-            raise exceptions.OpendataTransportConnectionError()
+            raise exceptions.OpendataTransportConnectionError() from aiohttpClientError
 
         try:
             for station in data["stations"]:
                 self.locations.append(self.get_station(station))
-        except (KeyError, TypeError, IndexError):
-            raise exceptions.OpendataTransportError()
+        except (KeyError, TypeError, IndexError) as e:
+            raise exceptions.OpendataTransportError() from e
 
 
 class OpendataTransportStationboard(OpendataTransportBase):
@@ -164,18 +164,18 @@ class OpendataTransportStationboard(OpendataTransportBase):
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
             _LOGGER.debug(data)
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             _LOGGER.error("Can not load data from transport.opendata.ch")
-            raise exceptions.OpendataTransportConnectionError()
+            raise exceptions.OpendataTransportConnectionError() from e
         except aiohttp.ClientError as aiohttpClientError:
             _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
-            raise exceptions.OpendataTransportConnectionError()
+            raise exceptions.OpendataTransportConnectionError() from aiohttpClientError
 
         try:
             for journey in data["stationboard"]:
                 self.journeys.append(self.get_journey(journey))
-        except (KeyError, TypeError, IndexError):
-            raise exceptions.OpendataTransportError()
+        except (KeyError, TypeError, IndexError) as e:
+            raise exceptions.OpendataTransportError() from e
 
     async def async_get_data(self):
         """Retrieve the data for the given station."""
@@ -297,12 +297,12 @@ class OpendataTransport(OpendataTransportBase):
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
             _LOGGER.debug(data)
-        except asyncio.TimeoutError:
+        except asyncio.TimeoutError as e:
             _LOGGER.error("Can not load data from transport.opendata.ch")
-            raise exceptions.OpendataTransportConnectionError()
+            raise exceptions.OpendataTransportConnectionError() from e
         except aiohttp.ClientError as aiohttpClientError:
             _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
-            raise exceptions.OpendataTransportConnectionError()
+            raise exceptions.OpendataTransportConnectionError() from aiohttpClientError
 
         try:
             self.from_id = data["from"]["id"]
@@ -313,5 +313,5 @@ class OpendataTransport(OpendataTransportBase):
             for connection in data["connections"]:
                 self.connections[index] = self.get_connection(connection)
                 index = index + 1
-        except (KeyError, TypeError, IndexError):
-            raise exceptions.OpendataTransportError()
+        except (KeyError, TypeError, IndexError) as e:
+            raise exceptions.OpendataTransportError() from e
