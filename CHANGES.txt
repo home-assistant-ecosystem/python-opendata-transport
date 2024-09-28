@@ -1,9 +1,10 @@
 Changes
 =======
 
-20240113 - 0.5.0
+20240929 - 0.5.0
 ----------------
 
+- Chain errors to be more transparent to the error source (thanks @miaucl)
 - Add KeyError exception (thanks @miaucl)
 - Add line numbers (thanks @polgarc)
 
