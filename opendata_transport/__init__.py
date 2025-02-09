@@ -1,4 +1,5 @@
 """Wrapper to get connection details from Opendata Transport."""
+
 import asyncio
 import logging
 from datetime import datetime, time, timedelta
@@ -10,13 +11,18 @@ from . import exceptions
 
 _LOGGER = logging.getLogger(__name__)
 _RESOURCE_URL = "http://transport.opendata.ch/v1/"
-_DEFAULT_RATE_LIMIT_STATS_HISTORY = 7 # default 7 days
+_DEFAULT_RATE_LIMIT_STATS_HISTORY = 7  # default 7 days
 
 
 class OpendataTransportBase(object):
     """Representation of the Opendata Transport base class"""
 
-    def __init__(self, session, enable_rate_limit_stats=False, rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY):
+    def __init__(
+        self,
+        session,
+        enable_rate_limit_stats=False,
+        rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY,
+    ):
         self._session = session
         self._enable_rate_limit_stats = enable_rate_limit_stats
         self._rate_limit_stats_history = rate_limit_stats_history
@@ -37,16 +43,21 @@ class OpendataTransportBase(object):
         print(url)
         return url
 
-
     def update_stats(self, success: bool = True) -> None:
         """Update the stats and record every call."""
         today = datetime.now().date()
         today_key = today.isoformat()
         keep_dates = [
-            (today - timedelta(days=i)).isoformat() for i in range(self._rate_limit_stats_history)
+            (today - timedelta(days=i)).isoformat()
+            for i in range(self._rate_limit_stats_history)
         ]
         if today_key not in self._rate_limit_stats:
-            self._rate_limit_stats[today_key] = {"count": 0, "errors": 0, "timestamps_success": [], "timestamps_error": []}
+            self._rate_limit_stats[today_key] = {
+                "count": 0,
+                "errors": 0,
+                "timestamps_success": [],
+                "timestamps_error": [],
+            }
         for key in [key for key in self._rate_limit_stats if key not in keep_dates]:
             del self._rate_limit_stats[key]
 
@@ -64,16 +75,16 @@ class OpendataTransportLocation(OpendataTransportBase):
     """A class for handling locations from Opendata Transport."""
 
     def __init__(
-            self, 
-            session, 
-            query=None, 
-            x=None, 
-            y=None, 
-            type_="all", 
-            fields=None, 
-            enable_rate_limit_stats=False, 
-            rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY
-        ):
+        self,
+        session,
+        query=None,
+        x=None,
+        y=None,
+        type_="all",
+        fields=None,
+        enable_rate_limit_stats=False,
+        rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY,
+    ):
         """Initialize the location."""
         super().__init__(session, enable_rate_limit_stats, rate_limit_stats_history)
 
