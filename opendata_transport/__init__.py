@@ -1,6 +1,7 @@
 """Wrapper to get connection details from Opendata Transport."""
 import asyncio
 import logging
+from datetime import datetime, time, timedelta
 
 import aiohttp
 import urllib.parse
@@ -9,13 +10,22 @@ from . import exceptions
 
 _LOGGER = logging.getLogger(__name__)
 _RESOURCE_URL = "http://transport.opendata.ch/v1/"
+_DEFAULT_RATE_LIMIT_STATS_HISTORY = 7 # default 7 days
 
 
 class OpendataTransportBase(object):
     """Representation of the Opendata Transport base class"""
 
-    def __init__(self, session):
+    def __init__(self, session, enable_rate_limit_stats=False, rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY):
         self._session = session
+        self._enable_rate_limit_stats = enable_rate_limit_stats
+        self._rate_limit_stats_history = rate_limit_stats_history
+        self._rate_limit_stats = {}
+
+    @property
+    def rate_limit_stats(self):
+        """Return the rate limit stats."""
+        return self._rate_limit_stats.copy()
 
     @staticmethod
     def get_url(resource, params):
@@ -28,12 +38,44 @@ class OpendataTransportBase(object):
         return url
 
 
+    def update_stats(self, success: bool = True) -> None:
+        """Update the stats and record every call."""
+        today = datetime.now().date()
+        today_key = today.isoformat()
+        keep_dates = [
+            (today - timedelta(days=i)).isoformat() for i in range(self._rate_limit_stats_history)
+        ]
+        if today_key not in self._rate_limit_stats:
+            self._rate_limit_stats[today_key] = {"count": 0, "errors": 0, "timestamps_success": [], "timestamps_error": []}
+        for key in [key for key in self._rate_limit_stats if key not in keep_dates]:
+            del self._rate_limit_stats[key]
+
+        print(self._rate_limit_stats)
+        time_value = datetime.now().time().isoformat()
+        self._rate_limit_stats[today_key]["count"] += 1
+        if success:
+            self._rate_limit_stats[today_key]["timestamps_success"].append(time_value)
+        else:
+            self._rate_limit_stats[today_key]["errors"] += 1
+            self._rate_limit_stats[today_key]["timestamps_error"].append(time_value)
+
+
 class OpendataTransportLocation(OpendataTransportBase):
     """A class for handling locations from Opendata Transport."""
 
-    def __init__(self, session, query=None, x=None, y=None, type_="all", fields=None):
+    def __init__(
+            self, 
+            session, 
+            query=None, 
+            x=None, 
+            y=None, 
+            type_="all", 
+            fields=None, 
+            enable_rate_limit_stats=False, 
+            rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY
+        ):
         """Initialize the location."""
-        super().__init__(session)
+        super().__init__(session, enable_rate_limit_stats, rate_limit_stats_history)
 
         self.query = query
         self.x = x
@@ -78,11 +120,14 @@ class OpendataTransportLocation(OpendataTransportBase):
 
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
+            self.update_stats(success=True)
             _LOGGER.debug(data)
         except asyncio.TimeoutError as e:
+            self.update_stats(success=False)
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError() from e
         except aiohttp.ClientError as aiohttpClientError:
+            self.update_stats(success=False)
             _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
             raise exceptions.OpendataTransportConnectionError() from aiohttpClientError
 
@@ -105,9 +150,11 @@ class OpendataTransportStationboard(OpendataTransportBase):
         datetime=None,
         type_="departure",
         fields=None,
+        enable_rate_limit_stats=False,
+        rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY,
     ):
         """Initialize the journey."""
-        super().__init__(session)
+        super().__init__(session, enable_rate_limit_stats, rate_limit_stats_history)
 
         self.station = station
         self.limit = limit
@@ -163,11 +210,14 @@ class OpendataTransportStationboard(OpendataTransportBase):
 
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
+            self.update_stats(success=True)
             _LOGGER.debug(data)
         except asyncio.TimeoutError as e:
+            self.update_stats(success=False)
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError() from e
         except aiohttp.ClientError as aiohttpClientError:
+            self.update_stats(success=False)
             _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
             raise exceptions.OpendataTransportConnectionError() from aiohttpClientError
 
@@ -209,9 +259,11 @@ class OpendataTransport(OpendataTransportBase):
         accessibility=None,
         via=None,
         fields=None,
+        enable_rate_limit_stats=False,
+        rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY,
     ):
         """Initialize the connection."""
-        super().__init__(session)
+        super().__init__(session, enable_rate_limit_stats, rate_limit_stats_history)
 
         self.limit = limit
         self.page = page
@@ -296,11 +348,14 @@ class OpendataTransport(OpendataTransportBase):
 
             _LOGGER.debug("Response from transport.opendata.ch: %s", response.status)
             data = await response.json()
+            self.update_stats(success=True)
             _LOGGER.debug(data)
         except asyncio.TimeoutError as e:
+            self.update_stats(success=False)
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError() from e
         except aiohttp.ClientError as aiohttpClientError:
+            self.update_stats(success=False)
             _LOGGER.error("Response from transport.opendata.ch: %s", aiohttpClientError)
             raise exceptions.OpendataTransportConnectionError() from aiohttpClientError
 
