@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 
 import aiohttp
 import urllib.parse
