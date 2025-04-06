@@ -202,11 +202,6 @@ class OpendataTransport(OpendataTransportBase):
         time=None,
         isArrivalTime=False,
         transportations=None,
-        direct=False,
-        sleeper=False,
-        couchette=False,
-        bike=False,
-        accessibility=None,
         via=None,
         fields=None,
     ):
@@ -226,11 +221,6 @@ class OpendataTransport(OpendataTransportBase):
             if transportations is not None and isinstance(transportations, list)
             else None
         )
-        self.direct = 1 if direct else 0
-        self.sleeper = 1 if sleeper else 0
-        self.couchette = 1 if couchette else 0
-        self.bike = 1 if bike else 0
-        self.accessibility = accessibility
         self.fields = (
             fields if fields is not None and isinstance(fields, list) else None
         )
@@ -271,10 +261,6 @@ class OpendataTransport(OpendataTransportBase):
             "limit": self.limit,
             "page": self.page,
             "isArrivalTime": self.isArrivalTime,
-            "direct": self.direct,
-            "sleeper": self.sleeper,
-            "couchette": self.couchette,
-            "bike": self.bike,
         }
         if self.via:
             params["via"] = self.via
@@ -284,8 +270,6 @@ class OpendataTransport(OpendataTransportBase):
             params["date"] = self.date
         if self.transportations:
             params["transportations"] = self.transportations
-        if self.accessibility:
-            params["accessibility"] = self.accessibility
         if self.fields:
             params["fields"] = self.fields
 
