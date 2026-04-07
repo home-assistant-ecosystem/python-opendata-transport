@@ -1,4 +1,5 @@
 """Example to get the details for a connection or a station."""
+
 import asyncio
 
 import aiohttp
@@ -35,7 +36,11 @@ async def main():
 
         # Get the connection for a defined route
         connection = OpendataTransport(
-            "Zürich, Blumenfeldstrasse", "Zürich Oerlikon, Bahnhof", session, 4
+            "Zürich, Blumenfeldstrasse",
+            "Zürich Oerlikon, Bahnhof",
+            session,
+            4,
+            enable_rate_limit_stats=True,
         )
         await connection.async_get_data()
 
@@ -47,6 +52,9 @@ async def main():
 
         # Print the details of the next connection
         print(connection.connections[0])
+
+        # Print the rate limit stats
+        print(connection.rate_limit_stats)
 
         print()
 
