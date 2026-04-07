@@ -17,6 +17,7 @@ async def main():
         await locations.async_get_data()
 
         # Print the locations data
+        print("Locations for query 'Stettb':")
         print(locations.locations)
 
         # Print as list
@@ -27,6 +28,8 @@ async def main():
         await locations.async_get_data()
 
         # Print the locations data
+        print()
+        print("Locations for coordinates (47.2, 8.7):")
         print(locations.locations)
 
         # Print as list
@@ -45,15 +48,22 @@ async def main():
         await connection.async_get_data()
 
         # Print the start and the destination name
+        print()
         print("Train connections:", connection.from_name, "->", connection.to_name)
 
         # Print the next three connections
+        print()
+        print("Next three connections:")
         print(connection.connections)
 
         # Print the details of the next connection
+        print()
+        print("Details of the next connection:")
         print(connection.connections[0])
 
         # Print the rate limit stats
+        print()
+        print("Rate limit stats:")
         print(connection.rate_limit_stats)
 
         print()
@@ -63,6 +73,7 @@ async def main():
         await stationboard.async_get_data()
 
         # Print the journey data
+        print("Stationboard")
         print(stationboard.journeys)
 
 
