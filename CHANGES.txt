@@ -1,6 +1,13 @@
 Changes
 =======
 
+20260407 - 0.6.0
+----------------
+
+- Update build-system
+- Add unittests
+- Add rate limit stats (thanks @miaucl)
+
 20240929 - 0.5.0
 ----------------
 
