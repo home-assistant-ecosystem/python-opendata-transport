@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "python_opendata_transport"
-version = "0.6.0"
+version = "0.6.2"
 description = "Python API for interacting with transport.opendata.ch."
 readme = "README.rst"
 license = { text = "MIT" }
