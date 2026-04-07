@@ -25,7 +25,7 @@ setup(
         "urllib3",
     ],
     packages=find_packages(),
-    python_requires=">=3.11",
+    python_requires=">=3.13",
     zip_safe=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -35,8 +35,8 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Utilities",
     ],
 )
