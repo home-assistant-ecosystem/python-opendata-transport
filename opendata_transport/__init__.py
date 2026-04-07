@@ -10,6 +10,8 @@ import urllib.parse
 from . import exceptions
 
 _LOGGER = logging.getLogger(__name__)
+if not logging.getLogger().hasHandlers():
+    logging.basicConfig(level=logging.INFO)
 _RESOURCE_URL = "http://transport.opendata.ch/v1/"
 _DEFAULT_RATE_LIMIT_STATS_HISTORY = 7  # default 7 days
 
@@ -40,7 +42,6 @@ class OpendataTransportBase(object):
         url = "{resource_url}{resource}?{param}".format(
             resource_url=_RESOURCE_URL, resource=resource, param=param
         )
-        print(url)
         return url
 
     def update_stats(self, success: bool = True) -> None:
@@ -61,7 +62,7 @@ class OpendataTransportBase(object):
         for key in [key for key in self._rate_limit_stats if key not in keep_dates]:
             del self._rate_limit_stats[key]
 
-        print(self._rate_limit_stats)
+        _LOGGER.debug(self._rate_limit_stats)
         time_value = datetime.now().time().isoformat()
         self._rate_limit_stats[today_key]["count"] += 1
         if success:
