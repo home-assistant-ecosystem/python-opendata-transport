@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "python_opendata_transport"
+version = "0.5.0"
+description = "Python API for interacting with transport.opendata.ch."
+readme = "README.rst"
+license = { text = "MIT" }
+authors = [
+  { name = "Fabian Affolter", email = "fabian@affolter-engineering.ch" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: MacOS :: MacOS X",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Utilities",
+]
+requires-python = ">=3.13"
+dependencies = [
+  "aiohttp>=3.8.5,<4",
+  "urllib3",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["opendata_transport"]
+
+[project.urls]
+Homepage = "https://github.com/home-assistant-ecosystem/python-opendata-transport"
+"Download URL" = "https://github.com/home-assistant-ecosystem/python-opendata-transport/releases"
