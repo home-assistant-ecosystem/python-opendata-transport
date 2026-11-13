@@ -130,3 +130,27 @@ async def test_connection_keyerror():
     connection = OpendataTransport("Bern", "Geneva", session)
     with pytest.raises(exceptions.OpendataTransportError):
         await connection.async_get_data()
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_stats_disabled_by_default():
+    """Test that no stats are recorded unless enabled."""
+    session = DummySession(DummyResponse(200, {"stations": []}))
+    location = OpendataTransportLocation(session, query="Bern")
+    await location.async_get_data()
+    assert location.rate_limit_stats == {}
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_stats_enabled():
+    """Test that stats are recorded when enabled."""
+    session = DummySession(DummyResponse(200, {"stations": []}))
+    location = OpendataTransportLocation(
+        session, query="Bern", enable_rate_limit_stats=True
+    )
+    await location.async_get_data()
+    await location.async_get_data()
+    (stats,) = location.rate_limit_stats.values()
+    assert stats["count"] == 2
+    assert stats["errors"] == 0
+    assert len(stats["timestamps_success"]) == 2
