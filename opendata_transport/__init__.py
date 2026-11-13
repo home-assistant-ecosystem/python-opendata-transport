@@ -1,11 +1,10 @@
 """Wrapper to get connection details from Opendata Transport."""
 
-import asyncio
 import logging
+import urllib.parse
 from datetime import datetime, timedelta
 
 import aiohttp
-import urllib.parse
 
 from . import exceptions
 
@@ -16,7 +15,7 @@ _RESOURCE_URL = "http://transport.opendata.ch/v1/"
 _DEFAULT_RATE_LIMIT_STATS_HISTORY = 7  # default 7 days
 
 
-class OpendataTransportBase(object):
+class OpendataTransportBase:
     """Representation of the Opendata Transport base class"""
 
     def __init__(
@@ -39,9 +38,7 @@ class OpendataTransportBase(object):
     def get_url(resource, params):
         """Generate the URL for the request."""
         param = urllib.parse.urlencode(params, True)
-        url = "{resource_url}{resource}?{param}".format(
-            resource_url=_RESOURCE_URL, resource=resource, param=param
-        )
+        url = f"{_RESOURCE_URL}{resource}?{param}"
         return url
 
     def update_stats(self, success: bool = True) -> None:
@@ -134,7 +131,7 @@ class OpendataTransportLocation(OpendataTransportBase):
             data = await response.json()
             self.update_stats(success=True)
             _LOGGER.debug(data)
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             self.update_stats(success=False)
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError() from e
@@ -224,7 +221,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
             data = await response.json()
             self.update_stats(success=True)
             _LOGGER.debug(data)
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             self.update_stats(success=False)
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError() from e
@@ -291,12 +288,12 @@ class OpendataTransport(OpendataTransportBase):
 
         self.from_name = self.from_id = self.to_name = self.to_id = None
 
-        self.connections = dict()
+        self.connections = {}
 
     @staticmethod
     def get_connection(connection):
         """Get the connection details."""
-        connection_info = dict()
+        connection_info = {}
         connection_info["departure"] = connection["from"]["departure"]
         connection_info["duration"] = connection["duration"]
         connection_info["delay"] = connection["from"]["delay"]
@@ -346,7 +343,7 @@ class OpendataTransport(OpendataTransportBase):
             data = await response.json()
             self.update_stats(success=True)
             _LOGGER.debug(data)
-        except asyncio.TimeoutError as e:
+        except TimeoutError as e:
             self.update_stats(success=False)
             _LOGGER.error("Can not load data from transport.opendata.ch")
             raise exceptions.OpendataTransportConnectionError() from e

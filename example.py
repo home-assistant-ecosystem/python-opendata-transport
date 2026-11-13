@@ -4,9 +4,11 @@ import asyncio
 
 import aiohttp
 
-from opendata_transport import OpendataTransport
-from opendata_transport import OpendataTransportStationboard
-from opendata_transport import OpendataTransportLocation
+from opendata_transport import (
+    OpendataTransport,
+    OpendataTransportLocation,
+    OpendataTransportStationboard,
+)
 
 
 async def main():
@@ -21,7 +23,7 @@ async def main():
         print(locations.locations)
 
         # Print as list
-        print(list(map(lambda x: x["name"], locations.locations)))
+        print([x["name"] for x in locations.locations])
 
         # Search a station by coordinates
         locations = OpendataTransportLocation(session, x=47.2, y=8.7)
@@ -33,7 +35,7 @@ async def main():
         print(locations.locations)
 
         # Print as list
-        print(list(map(lambda x: x["name"], locations.locations)))
+        print([x["name"] for x in locations.locations])
 
         print()
 
