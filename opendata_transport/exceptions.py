@@ -4,10 +4,6 @@
 class OpendataTransportError(Exception):
     """General OpenDataError exception occurred."""
 
-    pass
-
 
 class OpendataTransportConnectionError(OpendataTransportError):
     """When a connection error is encountered."""
-
-    pass
