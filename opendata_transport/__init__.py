@@ -196,6 +196,17 @@ class OpendataTransportStationboard(OpendataTransportBase):
             "category": journey["category"],
             "number": journey["number"],
             "to": journey["to"],
+            "pass_list": [
+                {
+                    "id": stop["station"]["id"],
+                    "name": stop["station"]["name"],
+                    "arrival": stop["arrival"],
+                    "departure": stop["departure"],
+                    "delay": stop["delay"],
+                    "platform": stop["platform"],
+                }
+                for stop in journey.get("passList") or []
+            ],
         }
 
     async def __async_get_data(self, station):
