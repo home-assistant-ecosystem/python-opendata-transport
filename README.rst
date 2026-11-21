@@ -33,7 +33,12 @@ be present in the ``unstable`` channel.
 Usage
 -----
 
-The file ``example.py`` contains an example about how to use this module.
+The file ``example.py`` contains an example about how to use this module. To run it
+directly from the repository without installing the module, use ``hatch``:
+
+.. code:: bash
+
+    $ hatch run python example.py
 
 License
 -------
