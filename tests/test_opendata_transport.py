@@ -85,6 +85,64 @@ async def test_stationboard_success():
     stationboard = OpendataTransportStationboard("Bern", session)
     await stationboard.async_get_data()
     assert stationboard.journeys[0]["name"] == "IC 1"
+    assert stationboard.journeys[0]["pass_list"] == []
+
+
+@pytest.mark.asyncio
+async def test_stationboard_pass_list():
+    """Test the stops a journey passes are returned."""
+    dummy_json = {
+        "stationboard": [
+            {
+                "stop": {
+                    "departure": "2024-01-01T12:00:00+01:00",
+                    "delay": 0,
+                    "platform": "1",
+                },
+                "name": "IC 1",
+                "category": "IC",
+                "number": "1",
+                "to": "Geneva",
+                "passList": [
+                    {
+                        "station": {"id": "8507000", "name": "Bern"},
+                        "arrival": None,
+                        "departure": "2024-01-01T12:00:00+01:00",
+                        "delay": 0,
+                        "platform": "1",
+                    },
+                    {
+                        "station": {"id": "8504100", "name": "Fribourg/Freiburg"},
+                        "arrival": "2024-01-01T12:21:00+01:00",
+                        "departure": "2024-01-01T12:23:00+01:00",
+                        "delay": 2,
+                        "platform": None,
+                    },
+                ],
+            }
+        ]
+    }
+    session = DummySession(DummyResponse(200, dummy_json))
+    stationboard = OpendataTransportStationboard("Bern", session)
+    await stationboard.async_get_data()
+    assert stationboard.journeys[0]["pass_list"] == [
+        {
+            "id": "8507000",
+            "name": "Bern",
+            "arrival": None,
+            "departure": "2024-01-01T12:00:00+01:00",
+            "delay": 0,
+            "platform": "1",
+        },
+        {
+            "id": "8504100",
+            "name": "Fribourg/Freiburg",
+            "arrival": "2024-01-01T12:21:00+01:00",
+            "departure": "2024-01-01T12:23:00+01:00",
+            "delay": 2,
+            "platform": None,
+        },
+    ]
 
 
 @pytest.mark.asyncio
