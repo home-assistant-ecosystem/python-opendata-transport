@@ -29,7 +29,7 @@ jobs:
 
     - name: Lint with ruff
       run: |
-        pip install ruff
+        pip install ruff==0.17.5
         ruff check .
 
     - name: Run tests with hatch

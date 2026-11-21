@@ -3,11 +3,11 @@
 import pytest
 
 from opendata_transport import (
+    OpendataTransport,
     OpendataTransportLocation,
     OpendataTransportStationboard,
-    OpendataTransport,
+    exceptions,
 )
-from opendata_transport import exceptions
 
 
 class DummyResponse:
