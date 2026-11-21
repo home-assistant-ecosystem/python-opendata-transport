@@ -43,6 +43,9 @@ class OpendataTransportBase:
 
     def update_stats(self, success: bool = True) -> None:
         """Update the stats and record every call."""
+        if not self._enable_rate_limit_stats:
+            return
+
         today = datetime.now().date()
         today_key = today.isoformat()
         keep_dates = [
