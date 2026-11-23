@@ -162,6 +162,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
         datetime=None,
         type_="departure",
         fields=None,
+        show_cancelled=False,
         enable_rate_limit_stats=False,
         rate_limit_stats_history=_DEFAULT_RATE_LIMIT_STATS_HISTORY,
     ):
@@ -180,6 +181,7 @@ class OpendataTransportStationboard(OpendataTransportBase):
         self.fields = (
             fields if fields is not None and isinstance(fields, list) else None
         )
+        self.show_cancelled = show_cancelled
 
         self.from_name = self.from_id = self.to_name = self.to_id = None
 
@@ -196,6 +198,10 @@ class OpendataTransportStationboard(OpendataTransportBase):
             "category": journey["category"],
             "number": journey["number"],
             "to": journey["to"],
+            "cancelled": journey.get("cancelled"),
+            "capacity_1st": journey.get("capacity1st"),
+            "capacity_2nd": journey.get("capacity2nd"),
+            "trip": journey.get("trip"),
             "pass_list": [
                 {
                     "id": stop["station"]["id"],
@@ -225,6 +231,8 @@ class OpendataTransportStationboard(OpendataTransportBase):
             params["transportations"] = self.transportations
         if self.fields:
             params["fields"] = self.fields
+        if self.show_cancelled:
+            params["showCancelled"] = 1
 
         url = self.get_url("stationboard", params)
 
@@ -312,13 +320,17 @@ class OpendataTransport(OpendataTransportBase):
         connection_info["duration"] = connection["duration"]
         connection_info["delay"] = connection["from"]["delay"]
         connection_info["transfers"] = connection["transfers"]
+        connection_info["capacity_1st"] = connection.get("capacity1st")
+        connection_info["capacity_2nd"] = connection.get("capacity2nd")
 
         # Sections journey can be null if there is a walking section at first
         connection_info["number"] = ""
+        connection_info["trip"] = None
         for section in connection["sections"]:
             if section["journey"] is not None:
                 journey = section["journey"]
                 connection_info["number"] = journey["name"]
+                connection_info["trip"] = journey.get("trip")
                 connection_info["line"] = "".join(
                     filter(None, [journey["category"], journey["number"]])
                 )
