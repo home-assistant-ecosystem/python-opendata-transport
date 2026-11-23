@@ -32,6 +32,7 @@ class DummySession:
 
     async def get(self, url, raise_for_status=True):
         """Simulate an HTTP GET request."""
+        self.url = url
         return self._response
 
 
@@ -143,6 +144,17 @@ async def test_stationboard_pass_list():
             "platform": None,
         },
     ]
+
+
+@pytest.mark.asyncio
+async def test_stationboard_datetime():
+    """Test the date and time of the departures is sent."""
+    session = DummySession(DummyResponse(200, {"stationboard": []}))
+    stationboard = OpendataTransportStationboard(
+        "Bern", session, datetime="2024-01-01 12:00"
+    )
+    await stationboard.async_get_data()
+    assert "datetime=2024-01-01+12%3A00" in session.url
 
 
 @pytest.mark.asyncio
