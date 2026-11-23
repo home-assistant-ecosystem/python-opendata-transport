@@ -32,6 +32,7 @@ class DummySession:
 
     async def get(self, url, raise_for_status=True):
         """Simulate an HTTP GET request."""
+        self.url = url
         return self._response
 
 
@@ -179,6 +180,39 @@ async def test_connection_success():
     connection = OpendataTransport("Bern", "Geneva", session)
     await connection.async_get_data()
     assert connection.connections[0]["departure"] == "2024-01-01T12:00:00+01:00"
+
+
+@pytest.mark.asyncio
+async def test_list_parameters():
+    """Test parameters with several values are sent with brackets."""
+    session = DummySession(DummyResponse(200, {"stationboard": []}))
+    stationboard = OpendataTransportStationboard(
+        "Bern",
+        session,
+        transportations=["train", "bus"],
+        fields=["stationboard/name"],
+    )
+    await stationboard.async_get_data()
+    assert "transportations%5B%5D=train&transportations%5B%5D=bus" in session.url
+    assert "fields%5B%5D=stationboard%2Fname" in session.url
+    assert "station=Bern" in session.url
+
+    session = DummySession(
+        DummyResponse(
+            200,
+            {
+                "from": {"id": "8507000", "name": "Bern"},
+                "to": {"id": "8503000", "name": "Geneva"},
+                "connections": [],
+            },
+        )
+    )
+    connection = OpendataTransport(
+        "Bern", "Geneva", session, via=["Fribourg/Freiburg", "Lausanne", "Nyon"]
+    )
+    await connection.async_get_data()
+    assert "via%5B%5D=Fribourg%2FFreiburg&via%5B%5D=Lausanne" in session.url
+    assert "Nyon" not in session.url
 
 
 @pytest.mark.asyncio

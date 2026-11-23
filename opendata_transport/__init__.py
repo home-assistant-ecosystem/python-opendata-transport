@@ -37,7 +37,14 @@ class OpendataTransportBase:
     @staticmethod
     def get_url(resource, params):
         """Generate the URL for the request."""
-        param = urllib.parse.urlencode(params, True)
+        # The API only reads all values of a parameter with a name ending in []
+        param = urllib.parse.urlencode(
+            {
+                f"{key}[]" if isinstance(value, list) else key: value
+                for key, value in params.items()
+            },
+            True,
+        )
         url = f"{_RESOURCE_URL}{resource}?{param}"
         return url
 
@@ -287,7 +294,8 @@ class OpendataTransport(OpendataTransportBase):
         self.page = page
         self.start = start
         self.destination = destination
-        self.via = via[:5] if via is not None and isinstance(via, list) else None
+        # The API refuses a request with more than two via stations
+        self.via = via[:2] if via is not None and isinstance(via, list) else None
         self.date = date
         self.time = time
         self.isArrivalTime = 1 if isArrivalTime else 0
