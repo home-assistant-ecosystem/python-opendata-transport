@@ -208,10 +208,11 @@ async def test_list_parameters():
         )
     )
     connection = OpendataTransport(
-        "Bern", "Geneva", session, via=["Fribourg/Freiburg", "Lausanne"]
+        "Bern", "Geneva", session, via=["Fribourg/Freiburg", "Lausanne", "Nyon"]
     )
     await connection.async_get_data()
     assert "via%5B%5D=Fribourg%2FFreiburg&via%5B%5D=Lausanne" in session.url
+    assert "Nyon" not in session.url
 
 
 @pytest.mark.asyncio

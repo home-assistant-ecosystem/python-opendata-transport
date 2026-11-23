@@ -294,7 +294,8 @@ class OpendataTransport(OpendataTransportBase):
         self.page = page
         self.start = start
         self.destination = destination
-        self.via = via[:5] if via is not None and isinstance(via, list) else None
+        # The API refuses a request with more than two via stations
+        self.via = via[:2] if via is not None and isinstance(via, list) else None
         self.date = date
         self.time = time
         self.isArrivalTime = 1 if isArrivalTime else 0
