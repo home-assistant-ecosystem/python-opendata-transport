@@ -32,6 +32,7 @@ class DummySession:
 
     async def get(self, url, raise_for_status=True):
         """Simulate an HTTP GET request."""
+        self.url = url
         return self._response
 
 
@@ -86,6 +87,46 @@ async def test_stationboard_success():
     await stationboard.async_get_data()
     assert stationboard.journeys[0]["name"] == "IC 1"
     assert stationboard.journeys[0]["pass_list"] == []
+    assert stationboard.journeys[0]["cancelled"] is None
+    assert stationboard.journeys[0]["capacity_1st"] is None
+    assert stationboard.journeys[0]["capacity_2nd"] is None
+    assert stationboard.journeys[0]["trip"] is None
+    assert "showCancelled" not in session.url
+
+
+@pytest.mark.asyncio
+async def test_stationboard_cancelled_capacity_trip():
+    """Test the cancellation, the occupancy and the trip of a journey."""
+    dummy_json = {
+        "stationboard": [
+            {
+                "stop": {
+                    "departure": "2024-01-01T12:00:00+01:00",
+                    "delay": 0,
+                    "platform": "1",
+                },
+                "name": "IC 1",
+                "category": "IC",
+                "number": "1",
+                "to": "Geneva",
+                "cancelled": True,
+                "capacity1st": 1,
+                "capacity2nd": 3,
+                "trip": {"id": "91-1-D.1.TA.2440.j26", "date": "2024-01-01"},
+            }
+        ]
+    }
+    session = DummySession(DummyResponse(200, dummy_json))
+    stationboard = OpendataTransportStationboard("Bern", session, show_cancelled=True)
+    await stationboard.async_get_data()
+    assert stationboard.journeys[0]["cancelled"] is True
+    assert stationboard.journeys[0]["capacity_1st"] == 1
+    assert stationboard.journeys[0]["capacity_2nd"] == 3
+    assert stationboard.journeys[0]["trip"] == {
+        "id": "91-1-D.1.TA.2440.j26",
+        "date": "2024-01-01",
+    }
+    assert "showCancelled=1" in session.url
 
 
 @pytest.mark.asyncio
@@ -179,6 +220,54 @@ async def test_connection_success():
     connection = OpendataTransport("Bern", "Geneva", session)
     await connection.async_get_data()
     assert connection.connections[0]["departure"] == "2024-01-01T12:00:00+01:00"
+    assert connection.connections[0]["capacity_1st"] is None
+    assert connection.connections[0]["capacity_2nd"] is None
+    assert connection.connections[0]["trip"] is None
+
+
+@pytest.mark.asyncio
+async def test_connection_capacity_trip():
+    """Test the occupancy of a connection and the trip of its first journey."""
+    dummy_json = {
+        "from": {"id": "8507000", "name": "Bern"},
+        "to": {"id": "8503000", "name": "Geneva"},
+        "connections": [
+            {
+                "from": {
+                    "departure": "2024-01-01T12:00:00+01:00",
+                    "delay": 0,
+                    "platform": "1",
+                },
+                "duration": "01:00:00",
+                "transfers": 0,
+                "capacity1st": 1,
+                "capacity2nd": 2,
+                "sections": [
+                    {"journey": None},
+                    {
+                        "journey": {
+                            "name": "IC 1",
+                            "category": "IC",
+                            "number": "1",
+                            "trip": {
+                                "id": "91-1-D.1.TA.2440.j26",
+                                "date": "2024-01-01",
+                            },
+                        }
+                    },
+                ],
+            }
+        ],
+    }
+    session = DummySession(DummyResponse(200, dummy_json))
+    connection = OpendataTransport("Bern", "Geneva", session)
+    await connection.async_get_data()
+    assert connection.connections[0]["capacity_1st"] == 1
+    assert connection.connections[0]["capacity_2nd"] == 2
+    assert connection.connections[0]["trip"] == {
+        "id": "91-1-D.1.TA.2440.j26",
+        "date": "2024-01-01",
+    }
 
 
 @pytest.mark.asyncio
