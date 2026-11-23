@@ -37,7 +37,14 @@ class OpendataTransportBase:
     @staticmethod
     def get_url(resource, params):
         """Generate the URL for the request."""
-        param = urllib.parse.urlencode(params, True)
+        # The API only reads all values of a parameter with a name ending in []
+        param = urllib.parse.urlencode(
+            {
+                f"{key}[]" if isinstance(value, list) else key: value
+                for key, value in params.items()
+            },
+            True,
+        )
         url = f"{_RESOURCE_URL}{resource}?{param}"
         return url
 
